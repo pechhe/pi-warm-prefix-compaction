@@ -1,0 +1,19 @@
+{
+  "name": "pi-warm-prefix-compaction",
+  "version": "0.1.0",
+  "description": "Cache-friendly warm-prefix compaction for pi",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "pi-package"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions/index.ts"
+    ]
+  }
+}
