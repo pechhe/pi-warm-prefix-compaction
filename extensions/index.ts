@@ -70,8 +70,8 @@ export default function warmPrefixCompaction(pi: ExtensionAPI): void {
 				},
 			};
 		} catch (error) {
-			console.warn(`[warm-prefix-compaction] cancelled: ${String(error)}`);
-			return { cancel: true };
+			console.warn(`[warm-prefix-compaction] failed: ${String(error)}`);
+			throw error;
 		}
 	});
 }

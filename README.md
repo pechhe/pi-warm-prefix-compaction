@@ -8,7 +8,7 @@ This preserves the warm provider prefix: model, system prompt, tools, conversati
 
 This extension requires the `ctx.completeFromLatestSettledRequest()` API from [`pechhe/pi`](https://github.com/pechhe/pi), branch `warm-prefix-v0.84.2`, commit `e9aed82b3` or later.
 
-It fails closed rather than allowing pi's standalone cold compaction request when the previous request cannot be reused safely.
+It fails closed and surfaces the error rather than allowing pi's standalone cold compaction request when the previous request cannot be reused safely.
 
 ## Install
 

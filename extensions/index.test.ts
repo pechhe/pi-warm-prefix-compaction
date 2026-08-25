@@ -47,4 +47,33 @@ describe("warm-prefix compaction request projection", () => {
       token: emitted[0]?.value.token,
     });
   });
+
+  test("releases authorization and fails loudly when continuation fails", async () => {
+    let handler: ((event: any, context: any) => Promise<any>) | undefined;
+    const emitted: any[] = [];
+    warmPrefixCompaction({
+      on(name: string, candidate: (event: any, context: any) => Promise<any>) {
+        if (name === "session_before_compact") handler = candidate;
+      },
+      events: { emit(_name: string, value: any) { emitted.push(value); } },
+    } as never);
+
+    const failure = new Error("projection rejected");
+    await expect(handler!(
+      {
+        signal: new AbortController().signal,
+        preparation: {
+          firstKeptEntryId: "kept",
+          tokensBefore: 42,
+          fileOps: { read: new Set(), written: new Set(), edited: new Set() },
+        },
+      },
+      {
+        model: { provider: "openai", id: "test" },
+        async completeFromLatestSettledRequest() { throw failure; },
+      },
+    )).rejects.toBe(failure);
+    expect(emitted.map((event) => event.action)).toEqual(["authorize", "release"]);
+    expect(emitted[1]?.token).toBe(emitted[0]?.token);
+  });
 });
