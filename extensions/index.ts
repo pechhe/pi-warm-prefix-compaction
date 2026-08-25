@@ -1,5 +1,8 @@
+import { randomUUID } from "node:crypto";
 import { contentText } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+const REQUEST_PROJECTION_EVENT = "pi-warm-prefix-compaction:request-projection";
 
 const COMPACTION_INSTRUCTION = `Create a dense continuation summary for this exact conversation state.
 
@@ -26,9 +29,23 @@ function instruction(customInstructions: string | undefined): string {
 export default function warmPrefixCompaction(pi: ExtensionAPI): void {
 	pi.on("session_before_compact", async (event, ctx) => {
 		try {
-			const response = await ctx.completeFromLatestSettledRequest(instruction(event.customInstructions), {
-				signal: event.signal,
+			const projectionToken = randomUUID();
+			pi.events.emit(REQUEST_PROJECTION_EVENT, {
+				action: "authorize",
+				token: projectionToken,
 			});
+			const response = await (async () => {
+				try {
+					return await ctx.completeFromLatestSettledRequest(instruction(event.customInstructions), {
+						signal: event.signal,
+					});
+				} finally {
+					pi.events.emit(REQUEST_PROJECTION_EVENT, {
+						action: "release",
+						token: projectionToken,
+					});
+				}
+			})();
 			const summary = contentText(response.content).trim();
 			if (!summary) throw new Error("The continuation returned no summary text");
 

@@ -28,3 +28,4 @@ The extension applies to terminal pi and applications such as Peach that load th
 - Preserves custom `/compact` instructions.
 - Records summary usage and file-operation metadata in the compaction entry.
 - Cancels compaction if model, thinking level, cache identity, system prompt, tools, or conversation prefix changed.
+- Emits a scoped request-projection authorization around the continuation call so hosts with durable request-evidence enforcement can verify and journal the compaction suffix without weakening unrelated requests.
