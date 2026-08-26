@@ -1,31 +1,25 @@
 # pi-warm-prefix-compaction
 
-A global [pi](https://github.com/earendil-works/pi) extension that generates compaction summaries by extending the latest successful provider request with one appended instruction.
+A global Pi extension providing one shared deterministic context-management path for terminal Pi and host applications such as Peach, while preserving cache-friendly hard compaction.
 
-This preserves the warm provider prefix: model, system prompt, tools, conversation history, request options, and cache/session identity remain unchanged. The summary is then persisted through pi's normal append-only compaction entry.
+## Context pipeline
 
-## Requirement
+`bounded tool production -> authoritative Pi JSONL -> deterministic provider projection -> discrete stale folds -> exact transcript recovery -> warm-prefix hard compaction`
 
-This extension requires the `ctx.completeFromLatestSettledRequest()` API from [`pechhe/pi`](https://github.com/pechhe/pi), branch `warm-prefix-v0.84.2`, commit `e9aed82b3` or later.
+The extension never creates a second transcript or raw-output store. Normal Pi session JSONL remains authoritative. Provider-only projections use literal deterministic head/tail previews, line and character guards, encoded-payload elision, a protected recent tail, and explicit fold epochs. `context_recover` retrieves exact targeted text from the original Pi session entry, including after resume.
 
-It fails closed and surfaces the error rather than allowing pi's standalone cold compaction request when the previous request cannot be reused safely.
+Unbounded `read` calls receive a conservative default window. Explicit offsets and limits remain unrestricted. Errors receive a larger diagnostic preview budget. `/context-bypass-next` provides one observable first-visibility escape hatch, and `/context-status` exposes current policy and savings.
+
+Stale folding is committed only at discrete pressure-triggered events and persisted as non-context custom session entries. Historical provider bytes remain stable between those events. Cache rewrite cost is reported as unknown when the provider does not expose it.
+
+## Warm-prefix compaction
+
+Hard compaction still extends the latest settled provider request with exactly one appended compaction instruction via `ctx.completeFromLatestSettledRequest()`. It does not replace Pi JSONL authority or use a separate summarization pipeline.
 
 ## Install
 
-Install the compatible pi fork, then install this package globally:
-
 ```sh
-pi install git:github.com/pechhe/pi-warm-prefix-compaction@v0.1.0
+pi install git:github.com/pechhe/pi-warm-prefix-compaction@v0.2.0
 ```
 
-The extension applies to terminal pi and applications such as Peach that load the same `~/.pi/agent` resources.
-
-## Behaviour
-
-- Uses pi's normal manual, threshold, and overflow compaction lifecycle.
-- Appends exactly one user instruction to the settled provider context.
-- Calls the provider directly outside the agent loop, so tools cannot execute.
-- Preserves custom `/compact` instructions.
-- Records summary usage and file-operation metadata in the compaction entry.
-- Cancels compaction if model, thinking level, cache identity, system prompt, tools, or conversation prefix changed.
-- Emits a scoped request-projection authorization around the continuation call so hosts with durable request-evidence enforcement can verify and journal the compaction suffix without weakening unrelated requests.
+This package is intentionally retaining its existing repository/install identity for migration compatibility while its scope expands beyond hard compaction.
