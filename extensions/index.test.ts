@@ -6,6 +6,11 @@ describe("warm-prefix compaction request projection", () => {
     let handler: ((event: any, context: any) => Promise<any>) | undefined;
     const emitted: Array<{ name: string; value: any }> = [];
     warmPrefixCompaction({
+      registerFlag() {},
+      registerCommand() {},
+      registerTool() {},
+      getFlag(name: string) { return name === "context-management" ? true : undefined; },
+      appendEntry() {},
       on(name: string, candidate: (event: any, context: any) => Promise<any>) {
         if (name === "session_before_compact") handler = candidate;
       },
@@ -52,6 +57,11 @@ describe("warm-prefix compaction request projection", () => {
     let handler: ((event: any, context: any) => Promise<any>) | undefined;
     const emitted: any[] = [];
     warmPrefixCompaction({
+      registerFlag() {},
+      registerCommand() {},
+      registerTool() {},
+      getFlag(name: string) { return name === "context-management" ? true : undefined; },
+      appendEntry() {},
       on(name: string, candidate: (event: any, context: any) => Promise<any>) {
         if (name === "session_before_compact") handler = candidate;
       },
